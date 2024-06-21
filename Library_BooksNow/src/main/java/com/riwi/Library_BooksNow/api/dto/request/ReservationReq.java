@@ -18,6 +18,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReservationReq {
+
+    private Long id;
     
     @NotBlank(message = "the user id is required")
     private Long user_id;

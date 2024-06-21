@@ -19,6 +19,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LoanReq {
 
+    private Long id;
+    
     @NotBlank(message = "the user id is required")
     private Long user_id;
 

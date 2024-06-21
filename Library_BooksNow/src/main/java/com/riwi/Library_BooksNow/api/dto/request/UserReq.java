@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UserReq {
 
+    private Long id;
+
     @NotBlank(message = "the user name is required")
     @Size(max = 50, message = "the user name maximum lenght is 50 characters")
     private String user_name;

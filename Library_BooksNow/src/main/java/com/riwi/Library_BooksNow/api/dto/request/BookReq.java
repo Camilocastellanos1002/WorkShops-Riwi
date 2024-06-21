@@ -13,6 +13,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class BookReq {
     
+
+    private Long id;
+
     @NotBlank(message = "the book title is required")
     @Size(max = 100, message = "the book title maximum lenght is 100 characters")
     private String title;
