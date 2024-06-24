@@ -1,6 +1,9 @@
 package com.riwi.Library_BooksNow.infrastructure.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.riwi.Library_BooksNow.api.dto.request.LoanReq;
@@ -8,7 +11,9 @@ import com.riwi.Library_BooksNow.api.dto.response.LoanResp;
 import com.riwi.Library_BooksNow.domain.entities.Loan;
 import com.riwi.Library_BooksNow.domain.repositories.LoanRepository;
 import com.riwi.Library_BooksNow.infrastructure.abstract_services.ILoanService;
+import com.riwi.Library_BooksNow.util.enums.SortType;
 import com.riwi.Library_BooksNow.util.mappers.LoanMapper;
+import com.riwi.Library_BooksNow.util.messages.ErrorMessage;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,41 +23,57 @@ import lombok.Data;
 @AllArgsConstructor
 public class LoanService implements ILoanService{
     
+    /*inyecciones */
     @Autowired
-    private final LoanRepository loanRepository;
+        private final LoanRepository loanRepository;
 
-    @Autowired
-    private final LoanMapper loanMapper;
-    
-    @Override
-    public LoanResp create(LoanReq request) {
-        Loan loan = this.loanMapper.requestToGetEntity(request);
+        @Autowired
+        private final LoanMapper loanMapper;
+    /* CRUD */
+        @Override
+        public LoanResp create(LoanReq request) {
+            Loan loan = this.loanMapper.requestToGetEntity(request);
 
-        return this.loanMapper.entityToGetResp(loanRepository.save(loan));
-    }
+            return this.loanMapper.entityToGetResp(loanRepository.save(loan));
+        }
+        
+        @SuppressWarnings("null")
+        @Override
+        public Page<LoanResp> getAll(int page, int size, SortType sortType) {
+            if (page<0) page =0;
 
-    @Override
-    public LoanResp getAll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAll'");
-    }
+                PageRequest pagination = null;
+                    switch (sortType) {
+                        case NONE -> pagination = PageRequest.of(page, size); 
+                        case ASC -> pagination = PageRequest.of(page, size, Sort.by(FIELD_BY_SORT).ascending()); //organizar de forma ascendente por titulo de lesson
+                        case DESC -> pagination  = PageRequest.of(page, size,Sort.by(FIELD_BY_SORT).descending()); //organizar de forma descendente por titulo de lesson
+                    }
+            
+            return this.loanRepository.findAll(pagination).map(loan -> loanMapper.entityToGetResp(loan));
+        }
+        
 
-    @Override
-    public LoanResp getById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getById'");
-    }
+        @Override
+        public LoanResp getById(Long id) {
+            return this.loanMapper.entityToGetResp(this.findLoan(id));
+        }
 
-    @Override
-    public LoanResp update(LoanReq request, Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
+        @Override
+        public LoanResp update(LoanReq request, Long id) {
 
-    @Override
-    public void delete(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
-    }
-    
+            Loan loanUpdate = this.loanMapper.requestToGetEntity(request);
+
+            return this.loanMapper.entityToGetResp(this.loanRepository.save(loanUpdate));
+        }
+
+        @Override
+        public void delete(Long id) {
+            this.loanRepository.delete(this.findLoan(id));
+        }
+
+
+    /* funcion buscador propia */
+        private Loan findLoan(Long id){
+            return this.loanRepository.findById(id).orElseThrow(()-> new com.riwi.Library_BooksNow.util.exceptions.BadRequestException(ErrorMessage.idNotFound("loan")));
+        }
 }

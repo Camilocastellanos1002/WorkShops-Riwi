@@ -1,6 +1,7 @@
 package com.riwi.Library_BooksNow.api.dto.errors;
 
 import java.util.List;
+import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,5 +16,5 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class ErrorResponse extends BaseErrorResponse{
     
-    private List<String> errors;
+    private List<Map<String,String>> errors;
 }
