@@ -25,8 +25,6 @@ public class UserResp {
 
     private String role;
 
-    private List<BookBasicResp> books;
-
     private List<LoanBasicResp> loans;
 
     private List<ReservationBasicResp> reservations;
