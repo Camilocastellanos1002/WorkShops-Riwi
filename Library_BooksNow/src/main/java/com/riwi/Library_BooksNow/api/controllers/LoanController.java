@@ -50,7 +50,7 @@ public class LoanController {
             return ResponseEntity.ok(this.loanService.create(request));
         }
     /* Read */
-        @GetMapping(path = "/{id}")
+        @GetMapping
         @Operation(summary = "Obtiene los prestamos de forma paginada y organizada por el nombre")
         public ResponseEntity<Page<LoanResp>>getAll(
             @RequestParam(defaultValue = "1") int page,
