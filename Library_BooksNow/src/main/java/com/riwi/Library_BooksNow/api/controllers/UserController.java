@@ -16,18 +16,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.riwi.Library_BooksNow.api.dto.errors.ErrorResponse;
 import com.riwi.Library_BooksNow.api.dto.request.UserReq;
 import com.riwi.Library_BooksNow.api.dto.response.UserResp;
 import com.riwi.Library_BooksNow.infrastructure.services.UserService;
 import com.riwi.Library_BooksNow.util.enums.SortType;
-import com.riwi.Library_BooksNow.util.messages.ErrorMessage;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -42,14 +39,14 @@ public class UserController {
 
     /* Crear */
         @PostMapping
-        @Operation(summary = "Crear un usuario")
-        @ApiResponse(
-            responseCode = "400", 
-            description = "Cuando el id no es valido", 
-            content = {
-                @Content(
-                    mediaType = "application/json", 
-                    schema = @Schema(implementation = ErrorResponse.class)) })
+        @Operation(summary = "crea un nuevo usuario", description = "crea un usuario ingresando los datos requeridos")
+        @ApiResponses(value = {
+                @ApiResponse(responseCode = "201", description = "SUCCESSFUL"),
+                @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
+                @ApiResponse(responseCode = "401", description = "NOT AUTHORIZED"),
+                @ApiResponse(responseCode = "403", description = "FORBIDDEN ACCESS"),
+                @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
+        })
         public ResponseEntity<UserResp> create(
             @Validated UserReq request
         ){
@@ -57,7 +54,37 @@ public class UserController {
         }
     
     /* Read */
-        
+        /*
+         * @Operation(
+    summary = "Get all roles", 
+    description = "Retrieve a paginated list of all roles", 
+    parameters = {
+        @Parameter(name = "page", 
+                   description = "Page number", 
+                   schema = @Schema(
+                    type = "integer", 
+                    defaultValue = "1")),
+        @Parameter(name = "size", 
+                   description = "Page size", 
+                   schema = @Schema(
+                    type = "integer", 
+                    defaultValue = "10")),
+        @Parameter(name = "sort", 
+                   description = "Sort criteria", 
+                   array = @ArraySchema(
+                    schema = @Schema(
+                        type = "string", 
+                        defaultValue = "status", 
+                        allowableValues = {"id", "name", "description", "status"})))
+    }, 
+    responses = {
+        @ApiResponse(responseCode = "200", description = "SUCCESSFUL"),
+        @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
+        @ApiResponse(responseCode = "401", description = "NOT AUTHORIZED"),
+        @ApiResponse(responseCode = "403", description = "FORBIDDEN ACCESS"),
+        @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
+    })
+         */
         @GetMapping
         @Operation(summary = "Obtiene los usuarios de forma paginada y organizada por el nombre")
         public ResponseEntity<Page<UserResp>>getAll(
@@ -73,32 +100,28 @@ public class UserController {
 
         @GetMapping(path = "/{id}")
         @Operation(summary = "Obtiene el usuario por id")
-        @ApiResponse(
-            responseCode = "400", 
-            description = "el id no es valido", 
-            content = {
-                @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ErrorMessage.class)
-                )
-            }
-        )
+        @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "200", description = "OK"),
+                @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
+                @ApiResponse(responseCode = "401", description = "NOT AUTHORIZED"),
+                @ApiResponse(responseCode = "403", description = "FORBIDDEN ACCESS"),
+                @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
+        })
         public ResponseEntity<UserResp> getById(@PathVariable Long id){
             return ResponseEntity.ok(this.userService.getById(id));
         }
     
     /* update */
         @PutMapping(path = "/{id}")
-        @Operation(summary = "Actualiza el usuario por id")
-        @ApiResponse(
-            responseCode = "400", 
-            description = "Cuando el id no es valido", 
-            content = { 
-                @Content(
-                    mediaType = "application/json", 
-                    schema = @Schema(implementation = ErrorResponse.class))
-                }
-        )
+        @Operation(summary = "Actualiza el usuario por id", description = "Actualiza un usuario creado previamente y los parametros seran enviados a travez de path")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "SUCCESSFUL"),
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
+            @ApiResponse(responseCode = "401", description = "NOT AUTHORIZED"),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN ACCESS"),
+            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
+    })
         public ResponseEntity<UserResp> update(
             @PathVariable Long id,
             @Validated @RequestBody UserReq request
@@ -108,16 +131,14 @@ public class UserController {
 
     /* delete */
         @DeleteMapping(path = "/{id}")
-        @Operation(summary = "Elimina el usuario por id")
-        @ApiResponse(
-            responseCode = "400", 
-            description = "Cuando el id no es valido", 
-            content = { 
-                @Content(
-                    mediaType = "application/json", 
-                    schema = @Schema(implementation = ErrorResponse.class))
-                }
-        )
+        @Operation(summary = "elimina usuario por id", description = "Elimina el registro de un usuario creado anteriormente")
+        @ApiResponses(value = {
+                @ApiResponse(responseCode = "200", description = "OK"),
+                @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
+                @ApiResponse(responseCode = "401", description = "NOT AUTHORIZED"),
+                @ApiResponse(responseCode = "403", description = "FORBIDDEN ACCESS"),
+                @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
+        })
         public ResponseEntity<Void> delete(@PathVariable Long id){
             this.userService.delete(id);
             return ResponseEntity.noContent().build();
